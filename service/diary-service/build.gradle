@@ -1,0 +1,9 @@
+// 공통 의존성은 루트 build.gradle에서 관리됨
+// 서비스별 특수 의존성만 여기에 추가
+
+bootJar.enabled = true
+jar.enabled = false
+
+dependencies {
+	// 서비스별 특수 의존성이 필요한 경우 여기에 추가
+}

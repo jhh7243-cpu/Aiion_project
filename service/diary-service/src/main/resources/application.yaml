@@ -1,0 +1,17 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: diary-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aidb
+    username: aiion
+    password: aiion4man
+    driver-class-name: org.postgresql.Driver
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+

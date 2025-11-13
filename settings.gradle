@@ -1,0 +1,17 @@
+rootProject.name = 'spring-server'
+
+// Server modules
+include 'server'
+project(':server').projectDir = file('server')
+include 'server:discovery'
+include 'server:config'
+include 'server:eureka'
+
+// Service modules
+include 'service'
+project(':service').projectDir = file('service')
+include 'service:common-service'
+include 'service:calendar-service'
+include 'service:diary-service'
+include 'service:soccer-service'
+include 'service:user-service'
