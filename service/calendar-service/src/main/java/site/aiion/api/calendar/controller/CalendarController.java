@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import site.aiion.api.calendar.domain.CalendarDTO;
+import site.aiion.api.calendar.domain.CalendarModel;
 import site.aiion.api.calendar.service.CalendarService;
-import site.aiion.api.common.domain.Messenger;
+import site.aiion.api.calendar.common.domain.Messenger;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,13 +33,13 @@ public class CalendarController {
     }
 
     @PostMapping
-    public Messenger create(@RequestBody CalendarDTO calendarDTO) {
-        return calendarService.create(calendarDTO);
+    public Messenger create(@RequestBody CalendarModel calendarModel) {
+        return calendarService.create(calendarModel);
     }
 
     @PutMapping("/{calendarId}")
-    public Messenger update(@PathVariable Long calendarId, @RequestBody CalendarDTO calendarDTO) {
-        return calendarService.update(calendarId, calendarDTO);
+    public Messenger update(@PathVariable Long calendarId, @RequestBody CalendarModel calendarModel) {
+        return calendarService.update(calendarId, calendarModel);
     }
 
     @DeleteMapping("/{calendarId}")

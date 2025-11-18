@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import site.aiion.api.common.domain.Messenger;
+import site.aiion.api.diary.common.domain.Messenger;
 import site.aiion.api.diary.domain.Diary;
-import site.aiion.api.diary.domain.DiaryDTO;
+import site.aiion.api.diary.domain.DiaryModel;
 import site.aiion.api.diary.repository.DiaryRepository;
 
 @Service
@@ -21,9 +21,9 @@ public class DiaryServiceImpl implements DiaryService {
 
     private final DiaryRepository diaryRepository;
 
-    private DiaryDTO entityToDto(Diary entity) {
+    private DiaryModel entityToModel(Diary entity) {
         LocalDate diaryDate = entity.getDiaryDate();
-        return DiaryDTO.builder()
+        return DiaryModel.builder()
                 .id(entity.getId())
                 .diaryDate(diaryDate)
                 .title(entity.getTitle())
@@ -31,19 +31,19 @@ public class DiaryServiceImpl implements DiaryService {
                 .build();
     }
 
-    private Diary dtoToEntity(DiaryDTO dto) {
+    private Diary modelToEntity(DiaryModel model) {
         return Diary.builder()
-                .id(dto.getId())
-                .diaryDate(dto.getDiaryDate())
-                .title(dto.getTitle())
-                .content(dto.getContent())
+                .id(model.getId())
+                .diaryDate(model.getDiaryDate())
+                .title(model.getTitle())
+                .content(model.getContent())
                 .build();
     }
 
     @Override
-    public Messenger findById(DiaryDTO diaryDTO) {
-        Objects.requireNonNull(diaryDTO, "diaryDTO must not be null");
-        Long id = diaryDTO.getId();
+    public Messenger findById(DiaryModel diaryModel) {
+        Objects.requireNonNull(diaryModel, "diaryModel must not be null");
+        Long id = diaryModel.getId();
         if (id == null) {
             return Messenger.builder()
                     .Code(400)
@@ -62,15 +62,15 @@ public class DiaryServiceImpl implements DiaryService {
         return Messenger.builder()
                 .Code(200)
                 .message("조회 성공")
-                .data(entityToDto(optionalDiary.get()))
+                .data(entityToModel(optionalDiary.get()))
                 .build();
     }
 
     @Override
     public Messenger findAll() {
-        List<DiaryDTO> diaries = diaryRepository.findAll()
+        List<DiaryModel> diaries = diaryRepository.findAll()
                 .stream()
-                .map(this::entityToDto)
+                .map(this::entityToModel)
                 .collect(Collectors.toList());
 
         return Messenger.builder()
@@ -82,36 +82,36 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     @Transactional
-    public Messenger save(DiaryDTO diaryDTO) {
-        Objects.requireNonNull(diaryDTO, "diaryDTO must not be null");
-        if (diaryDTO.getDiaryDate() == null) {
+    public Messenger save(DiaryModel diaryModel) {
+        Objects.requireNonNull(diaryModel, "diaryModel must not be null");
+        if (diaryModel.getDiaryDate() == null) {
             return Messenger.builder()
                     .Code(400)
                     .message("일자 정보는 필수 값입니다.")
                     .build();
         }
 
-        Diary toSave = dtoToEntity(diaryDTO);
+        Diary toSave = modelToEntity(diaryModel);
         Diary saved = diaryRepository.save(Objects.requireNonNull(toSave, "entity must not be null"));
 
         return Messenger.builder()
                 .Code(200)
                 .message("저장 성공: ID " + saved.getId())
-                .data(entityToDto(saved))
+                .data(entityToModel(saved))
                 .build();
     }
 
     @Override
     @Transactional
-    public Messenger saveAll(List<DiaryDTO> diaryDTOList) {
-        Objects.requireNonNull(diaryDTOList, "diaryDTOList must not be null");
+    public Messenger saveAll(List<DiaryModel> diaryModelList) {
+        Objects.requireNonNull(diaryModelList, "diaryModelList must not be null");
 
-        List<Diary> entities = diaryDTOList.stream()
-                .map(dto -> {
-                    if (dto.getDiaryDate() == null) {
+        List<Diary> entities = diaryModelList.stream()
+                .map(model -> {
+                    if (model.getDiaryDate() == null) {
                         throw new IllegalArgumentException("일자 정보는 필수 값입니다.");
                     }
-                    return dtoToEntity(dto);
+                    return modelToEntity(model);
                 })
                 .collect(Collectors.toList());
 
@@ -125,16 +125,16 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     @Transactional
-    public Messenger update(DiaryDTO diaryDTO) {
-        Objects.requireNonNull(diaryDTO, "diaryDTO must not be null");
-        Long id = diaryDTO.getId();
+    public Messenger update(DiaryModel diaryModel) {
+        Objects.requireNonNull(diaryModel, "diaryModel must not be null");
+        Long id = diaryModel.getId();
         if (id == null) {
             return Messenger.builder()
                     .Code(400)
                     .message("ID는 필수 값입니다.")
                     .build();
         }
-        if (diaryDTO.getDiaryDate() == null) {
+        if (diaryModel.getDiaryDate() == null) {
             return Messenger.builder()
                     .Code(400)
                     .message("일자 정보는 필수 값입니다.")
@@ -150,23 +150,23 @@ public class DiaryServiceImpl implements DiaryService {
         }
 
         Diary diary = optionalDiary.get();
-        diary.setDiaryDate(diaryDTO.getDiaryDate());
-        diary.setTitle(diaryDTO.getTitle());
-        diary.setContent(diaryDTO.getContent());
+        diary.setDiaryDate(diaryModel.getDiaryDate());
+        diary.setTitle(diaryModel.getTitle());
+        diary.setContent(diaryModel.getContent());
 
         Diary saved = diaryRepository.save(diary);
         return Messenger.builder()
                 .Code(200)
                 .message("수정 성공: ID " + saved.getId())
-                .data(entityToDto(saved))
+                .data(entityToModel(saved))
                 .build();
     }
 
     @Override
     @Transactional
-    public Messenger delete(DiaryDTO diaryDTO) {
-        Objects.requireNonNull(diaryDTO, "diaryDTO must not be null");
-        Long id = diaryDTO.getId();
+    public Messenger delete(DiaryModel diaryModel) {
+        Objects.requireNonNull(diaryModel, "diaryModel must not be null");
+        Long id = diaryModel.getId();
         if (id == null) {
             return Messenger.builder()
                     .Code(400)

@@ -1,5 +1,11 @@
-FROM openjdk:21-slim
-VOLUME /tmp
-RUN apt-get update && apt-get install -y curl
-COPY ./build/libs/*.jar user-service.jar
-ENTRYPOINT ["java", "-jar", "/user-service.jar"]
+# 빌드 단계
+FROM gradle:8.5-jdk21 AS builder
+WORKDIR /build
+COPY . .
+RUN gradle :service:user-service:build -x test
+
+# 실행 단계 (slim 버전 사용)
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /build/service/user-service/build/libs/*.jar app.jar
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

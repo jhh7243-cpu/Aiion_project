@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: soccer-service
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5432/aidb
     username: aiion
@@ -11,16 +16,13 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000
-      maximum-pool-size: 1
-      minimum-idle: 0
-      idle-timeout: 60000
-      max-lifetime: 300000
-      leak-detection-threshold: 10000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
       connection-test-query: SELECT 1
-      pool-name: SpringBootHikariCP
       validation-timeout: 3000
-      register-mbeans: false
-      connection-init-sql: SELECT 1
   jpa:
     hibernate:
       ddl-auto: update
@@ -62,6 +64,13 @@ springdoc:
     enabled: true
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka:8761/eureka/
+    registry-fetch-interval-seconds: 5

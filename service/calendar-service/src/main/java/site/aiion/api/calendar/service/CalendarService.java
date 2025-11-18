@@ -1,7 +1,7 @@
 package site.aiion.api.calendar.service;
 
-import site.aiion.api.calendar.domain.CalendarDTO;
-import site.aiion.api.common.domain.Messenger;
+import site.aiion.api.calendar.domain.CalendarModel;
+import site.aiion.api.calendar.common.domain.Messenger;
 
 public interface CalendarService {
 
@@ -9,9 +9,9 @@ public interface CalendarService {
 
     Messenger findAll();
 
-    Messenger create(CalendarDTO calendarDTO);
+    Messenger create(CalendarModel calendarModel);
 
-    Messenger update(Long calendarId, CalendarDTO calendarDTO);
+    Messenger update(Long calendarId, CalendarModel calendarModel);
 
     Messenger delete(Long calendarId);
 }

@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import site.aiion.api.calendar.domain.Calendar;
-import site.aiion.api.calendar.domain.CalendarDTO;
+import site.aiion.api.calendar.domain.CalendarModel;
 import site.aiion.api.calendar.repository.CalendarRepository;
-import site.aiion.api.common.domain.Messenger;
+import site.aiion.api.calendar.common.domain.Messenger;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +19,8 @@ import site.aiion.api.common.domain.Messenger;
 public class CalendarServiceImpl implements CalendarService {
 
     private final CalendarRepository calendarRepository;
-    private CalendarDTO toDto(Calendar calendar) {
-        return CalendarDTO.builder()
+    private CalendarModel entityToModel(Calendar calendar) {
+        return CalendarModel.builder()
                 .id(calendar.getId())
                 .name(calendar.getName())
                 .build();
@@ -33,7 +33,7 @@ public class CalendarServiceImpl implements CalendarService {
                 .map(calendar -> Messenger.builder()
                         .Code(200)
                         .message("조회 성공")
-                        .data(toDto(calendar))
+                        .data(entityToModel(calendar))
                         .build())
                 .orElseGet(() -> Messenger.builder()
                         .Code(404)
@@ -43,9 +43,9 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public Messenger findAll() {
-        List<CalendarDTO> calendars = calendarRepository.findAll()
+        List<CalendarModel> calendars = calendarRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .map(this::entityToModel)
                 .collect(Collectors.toList());
 
         return Messenger.builder()
@@ -57,10 +57,10 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     @Transactional
-    public Messenger create(CalendarDTO calendarDTO) {
-        Objects.requireNonNull(calendarDTO, "calendarDTO must not be null");
+    public Messenger create(CalendarModel calendarModel) {
+        Objects.requireNonNull(calendarModel, "calendarModel must not be null");
         Calendar calendar = Calendar.builder()
-                .name(calendarDTO.getName())
+                .name(calendarModel.getName())
                 .build();
 
         Calendar savedCalendar = calendarRepository.save(Objects.requireNonNull(calendar, "calendar must not be null"));
@@ -68,20 +68,20 @@ public class CalendarServiceImpl implements CalendarService {
         return Messenger.builder()
                 .Code(200)
                 .message("저장 성공: ID " + savedCalendar.getId())
-                .data(toDto(savedCalendar))
+                .data(entityToModel(savedCalendar))
                 .build();
     }
 
     @Override
     @Transactional
-    public Messenger update(Long calendarId, CalendarDTO calendarDTO) {
+    public Messenger update(Long calendarId, CalendarModel calendarModel) {
         Objects.requireNonNull(calendarId, "calendarId must not be null");
-        Objects.requireNonNull(calendarDTO, "calendarDTO must not be null");
+        Objects.requireNonNull(calendarModel, "calendarModel must not be null");
         return calendarRepository.findById(calendarId)
                 .map(calendarEntity -> {
                     Calendar calendar = Objects.requireNonNull(calendarEntity, "calendar must not be null");
-                    if (calendarDTO.getName() != null) {
-                        calendar.setName(calendarDTO.getName());
+                    if (calendarModel.getName() != null) {
+                        calendar.setName(calendarModel.getName());
                     }
 
                     Calendar savedCalendar = calendarRepository.save(calendar);
@@ -89,7 +89,7 @@ public class CalendarServiceImpl implements CalendarService {
                     return Messenger.builder()
                             .Code(200)
                             .message("수정 성공: ID " + calendarId)
-                            .data(toDto(savedCalendar))
+                            .data(entityToModel(savedCalendar))
                             .build();
                 })
                 .orElseGet(() -> Messenger.builder()
